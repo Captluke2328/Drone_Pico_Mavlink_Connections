@@ -1,4 +1,4 @@
-#include "C:\Users\Lukas\Documents\Arduino\libraries\ArduinoMAVLink\heartbeat_004\mavlinkv2\common\mavlink.h"
+#include "C:\Users\jlukas\Documents\Arduino\libraries\mavlinkv2\common\mavlink.h"
 
 unsigned long HeartbeatTime = 0;
 
@@ -8,10 +8,11 @@ void setup() {
   Serial.begin(57600);
   Serial.println("MAVLink starting.");
 
-
 }
 
 void loop() {
+
+  int menu = Serial.parseInt();
 
   if ( (millis() - HeartbeatTime) > 1000 ) {
     HeartbeatTime = millis();
@@ -20,13 +21,12 @@ void loop() {
 
    while (Serial.available() == 0) {
   }
-//ARM();
 
   
-  //TAKEOFF();
-  
   // Working
-  // int menu = Serial.parseInt();
+  ARM(menu);
+  TAKEOFF();
+
   //CHANGEMODE(menu);
 }
 
@@ -42,18 +42,31 @@ void PIX_HEART_BEAT()
   Serial1.write(buf, len);
 }
 
-void ARM()
+void ARM(int menu)
 {
 
+  // 400 is referring to MAV_CMD_COMPONENT_ARM_DISARM (400 ). See https://mavlink.io/en/messages/common.html
+
+  //Method 1
+  // mavlink_message_t msg;
+  // uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+ 
+  // if (menu == 1){mavlink_msg_command_long_pack(255, 151, &msg, 1, 1, 400, 1,1.0,0,0,0,0,0,0);}  
+  // else if (menu = 0){mavlink_msg_command_long_pack(255, 151, &msg, 1, 1, 400, 1,0.0,0,0,0,0,0,0);}
+  
+  // uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
+  // Serial1.write(buf, len);
+  
+  //Method 2
   mavlink_message_t messaggio;
   mavlink_command_long_t comando; //struttura dati relativa al comando mavlink long
-  char buf[300];
-  comando.command = MAV_CMD_COMPONENT_ARM_DISARM; //settaggio valori della struct relativa al comando
+  char buf[MAVLINK_MAX_PACKET_LEN];
+  comando.command = 400; //settaggio valori della struct relativa al comando
   comando.target_system = 1;
-  comando.target_component = 0;
+  comando.target_component = 1;
   comando.confirmation = true;
   comando.param1 = 1;
-  comando.param2 = 21196;
+  comando.param2 = 1;
   comando.param3 = 0;
   comando.param4 = 0;
   comando.param5 = 0;
@@ -71,11 +84,10 @@ void TAKEOFF()
 
 mavlink_message_t messaggio; //messaggio da inviare
 mavlink_command_long_t comando; //struttura dati relativa al comando mavlink long
-char buf[300];
-
-comando.command = MAV_CMD_NAV_TAKEOFF; //settaggio valori della struct relativa al comando
+char buf[MAVLINK_MAX_PACKET_LEN];
+comando.command = 22; //settaggio valori della struct relativa al comando
 comando.target_system = 1;
-comando.target_component = 255;
+comando.target_component = 1;
 comando.confirmation = true;
 comando.param1 = 0;
 comando.param2 = 0;
@@ -83,34 +95,11 @@ comando.param3 = 0;
 comando.param4 = 0;
 comando.param5 = 0;
 comando.param6 = 0;
-comando.param7 = 1;
+comando.param7 = 1.5;
 
 mavlink_msg_command_long_encode(255, 151, &messaggio, &comando);
 unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &messaggio);
 Serial1.write(buf, len);
-
-//    uint8_t _system_id = 255;
-//   mavlink_command_long_t takeoff_cmd;
-//   takeoff_cmd.command = MAV_CMD_NAV_TAKEOFF;
-//   takeoff_cmd.param1 = 0;
-//   takeoff_cmd.param4 = 0;
-//   takeoff_cmd.param5 = 0; //current_messages.gps_raw_int.lat;
-//   takeoff_cmd.param6 = 0;//current_messages.gps_raw_int.lon;
-//   takeoff_cmd.param7 = 0;//(current_messages.gps_raw_int.alt)/1000 + hauteur;
-//   takeoff_cmd.target_system = _system_id;
-//   takeoff_cmd.confirmation = true;
-
-//     // Initialize the required buffers
-//   mavlink_command_long_t msg;
-//   uint8_t buf[MAVLINK_MAX_PACKET_LEN];
-
-//   // Pack the message
-// mavlink_msg_command_long_encode(1, 250, &messaggio, &comando);
-// unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buf, &messaggio);
-//   // Copy the message to the send buffer
-//   uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
-//   // Send the message (.write sends as bytes)
-//   Serial1.write(buf, len);
 
 }
 
@@ -154,7 +143,6 @@ Flight / Driving Modes (change custom mode above)
 
  
 }
-
 
 
 

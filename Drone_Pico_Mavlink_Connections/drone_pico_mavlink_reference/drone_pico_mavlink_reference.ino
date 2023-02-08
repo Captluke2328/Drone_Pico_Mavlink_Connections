@@ -1,4 +1,4 @@
-#include "C:\Users\Lukas\Documents\Arduino\libraries\ArduinoMAVLink\heartbeat_004\mavlinkv2\common\mavlink.h"
+#include "C:\Users\jlukas\Documents\Arduino\libraries\mavlinkv2\common\mavlink.h"
 
 //Reflects connection with the drone
 static const String HEARTBEATING = "HEARTBEATING";
@@ -407,7 +407,6 @@ void mav_override_rc(int roll, int pitch, int throttle, int yaw) {
  * Based on https://github.com/hmartiro/android-arduino-wifi
  * 
  */
-
 
 
 
